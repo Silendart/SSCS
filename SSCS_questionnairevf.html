@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSCS — Échelle Courte du Soi Créatif</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #111009;
+      --surface:    #1c1a16;
+      --surface2:   #252118;
+      --border:     #302c24;
+      --text:       #f0ead8;
+      --muted:      #8a7e6a;
+      --gold:       #d4a53f;
+      --gold-light: #f0c96a;
+      --sage:       #72b08a;
+      --rose:       #c87858;
+      --violet:     #a06fc8;
+      --sky:        #6aa4c8;
+      --r: 14px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+    }
+
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* ─── LANDING ─────────────────────────────────────────────── */
+    #landing {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    #landing::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(212,165,63,0.07) 0%, transparent 68%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+    }
+    .land-badge {
+      display: inline-block;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(212,165,63,0.25);
+      padding: 6px 16px; border-radius: 100px;
+      margin-bottom: 36px;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+    .land-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(56px, 10vw, 108px);
+      font-weight: 300; line-height: 0.9; letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      animation: fadeUp 0.7s 0.1s var(--ease) both;
+    }
+    .land-title em { color: var(--gold); font-style: italic; }
+    .land-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(17px, 2.5vw, 22px);
+      font-weight: 300; font-style: italic;
+      color: var(--muted);
+      margin-bottom: 40px;
+      animation: fadeUp 0.7s 0.2s var(--ease) both;
+    }
+    .land-desc {
+      max-width: 500px; font-size: 14.5px; font-weight: 300;
+      color: var(--muted); line-height: 1.75;
+      margin-bottom: 48px;
+      animation: fadeUp 0.7s 0.3s var(--ease) both;
+    }
+    .land-desc strong { color: var(--text); font-weight: 400; }
+    .land-cta {
+      animation: fadeUp 0.7s 0.4s var(--ease) both;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .land-meta {
+      font-size: 11px; color: var(--muted); opacity: 0.55; letter-spacing: 0.06em;
+      animation: fadeUp 0.7s 0.5s var(--ease) both;
+      margin-top: 32px;
+    }
+    .land-deco {
+      position: absolute; bottom: 32px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 8px;
+      animation: fadeUp 0.7s 0.6s var(--ease) both;
+    }
+    .land-deco-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
+    .land-deco-dot:nth-child(2) { background: var(--gold); opacity: 0.5; }
+
+    /* ─── BOUTONS ────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--gold); color: #111009;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 14px 36px; border-radius: 100px; border: none; cursor: pointer;
+      transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(212,165,63,0.25);
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+      padding: 11px 22px; border-radius: 100px;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+    /* ─── QUESTIONNAIRE ──────────────────────────────────────── */
+    #questionnaire { flex-direction: column; align-items: center; justify-content: flex-start; }
+
+    .prog-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--border); z-index: 100;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+      transition: width 0.55s var(--ease);
+      width: 0%;
+    }
+
+    .q-wrap {
+      width: 100%; max-width: 660px;
+      margin: 0 auto;
+      padding: 72px 28px 48px;
+      display: flex; flex-direction: column;
+      animation: fadeUp 0.4s var(--ease) both;
+    }
+
+    .q-meta {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 52px;
+    }
+    .q-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px; font-weight: 300; color: var(--gold);
+      line-height: 1;
+    }
+    .q-sep { width: 1px; height: 36px; background: var(--border); }
+    .q-of { font-size: 12px; font-weight: 300; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+    .q-subscale {
+      margin-left: auto;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); border: 1px solid var(--border);
+      padding: 4px 12px; border-radius: 100px;
+    }
+    .q-subscale.identity { color: var(--sage); border-color: rgba(114,176,138,0.3); }
+    .q-subscale.efficacy { color: var(--rose); border-color: rgba(200,120,88,0.3); }
+
+    .q-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(26px, 4.5vw, 40px);
+      font-weight: 400; line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 52px;
+    }
+
+    .scale-head { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .scale-head span { font-size: 10px; font-weight: 300; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .scale-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .sc-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 5px;
+      padding: 14px 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s, transform 0.15s;
+      outline: none;
+    }
+    .sc-btn .n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; color: var(--muted);
+      line-height: 1; transition: color 0.18s;
+    }
+    .sc-btn .lbl {
+      font-size: 8px; font-weight: 400; color: var(--muted);
+      text-align: center; line-height: 1.2; opacity: 0.7;
+      transition: opacity 0.18s, color 0.18s;
+    }
+    .sc-btn:hover { border-color: rgba(212,165,63,0.35); background: rgba(212,165,63,0.04); transform: translateY(-1px); }
+    .sc-btn:hover .n { color: var(--gold); }
+    .sc-btn:hover .lbl { opacity: 1; color: var(--gold); }
+    .sc-btn.sel { border-color: var(--gold); background: rgba(212,165,63,0.1); }
+    .sc-btn.sel .n { color: var(--gold-light); }
+    .sc-btn.sel .lbl { color: var(--gold); opacity: 1; }
+
+    .q-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 44px;
+    }
+    .btn-next {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold); color: #111009;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 12px 28px; border-radius: 100px; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.2s, opacity 0.2s;
+      opacity: 0.25; pointer-events: none;
+    }
+    .btn-next.on { opacity: 1; pointer-events: all; }
+    .btn-next.on:hover { background: var(--gold-light); transform: translateX(2px); }
+
+    /* ─── RÉSULTATS ──────────────────────────────────────────── */
+    #results { flex-direction: column; align-items: center; }
+
+    .res-wrap {
+      width: 100%; max-width: 700px;
+      margin: 0 auto;
+      padding: 72px 28px 80px;
+    }
+
+    .res-head { text-align: center; margin-bottom: 56px; }
+    .res-eyebrow {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 14px;
+      animation: fadeUp 0.5s var(--ease) both;
+    }
+    .res-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(42px, 7vw, 76px);
+      font-weight: 300; line-height: 0.95;
+      animation: fadeUp 0.5s 0.08s var(--ease) both;
+    }
+    .res-title em { color: var(--gold); font-style: italic; }
+
+    .score-wrap { text-align: center; margin-bottom: 44px; animation: fadeUp 0.5s 0.15s var(--ease) both; }
+    .score-ring {
+      position: relative; display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 176px; height: 176px;
+      margin-bottom: 20px;
+    }
+    .score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+    .score-inner { position: relative; z-index: 1; }
+    .score-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 58px; font-weight: 300; line-height: 1;
+      display: block;
+    }
+    .score-denom { font-size: 18px; font-weight: 300; color: var(--muted); }
+    .level-badge {
+      display: inline-block;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 6px 18px; border-radius: 100px;
+      border: 1px solid currentColor;
+      transition: color 0.5s, border-color 0.5s;
+    }
+
+    .feedback-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 32px 36px;
+      margin-bottom: 32px;
+      position: relative; overflow: hidden;
+      animation: fadeUp 0.5s 0.25s var(--ease) both;
+    }
+    .feedback-box::before {
+      content: '\201C';
+      position: absolute; top: -24px; left: 24px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 140px; color: var(--gold); opacity: 0.06;
+      line-height: 1; pointer-events: none; user-select: none;
+    }
+    .feedback-txt {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; font-style: italic;
+      line-height: 1.65; color: var(--text);
+      position: relative; z-index: 1;
+    }
+
+    .subscales {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.35s var(--ease) both;
+    }
+    .sub-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px;
+    }
+    .sub-tag {
+      font-size: 9.5px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .sub-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 400; margin-bottom: 16px;
+    }
+    .sub-score {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px; font-weight: 300; line-height: 1;
+      margin-bottom: 14px;
+    }
+    .sub-score span { font-size: 17px; color: var(--muted); }
+    .sub-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .sub-fill { height: 100%; border-radius: 2px; transition: width 1.1s var(--ease); width: 0%; }
+    .sub-desc { margin-top: 12px; font-size: 12.5px; font-weight: 300; color: var(--muted); line-height: 1.55; }
+
+    .interp-section {
+      margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.42s var(--ease) both;
+    }
+    .interp-title {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px;
+    }
+    .interp-table { width: 100%; border-collapse: collapse; }
+    .interp-table th {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); text-align: left; padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .interp-table td {
+      font-size: 13px; font-weight: 300; color: var(--muted);
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+    }
+    .interp-table tr.current td { color: var(--text); background: rgba(212,165,63,0.06); }
+    .interp-table td:first-child { font-weight: 400; }
+    .lvl-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      margin-right: 7px; vertical-align: middle;
+    }
+
+    .res-footer {
+      text-align: center; padding-top: 28px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.5s 0.5s var(--ease) both;
+    }
+    .res-footer p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+    @media (max-width: 520px) {
+      .subscales { grid-template-columns: 1fr; }
+      .scale-grid { gap: 4px; }
+      .sc-btn { padding: 11px 2px 8px; }
+      .sc-btn .n { font-size: 17px; }
+      .sc-btn .lbl { font-size: 6.5px; }
+      .q-subscale { display: none; }
+      .feedback-box { padding: 24px; }
+      .feedback-txt { font-size: 18px; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════ ACCUEIL ══════════════════════ -->
+<div id="landing" class="screen active">
+  <div class="land-badge">Karwowski, 2012 &nbsp;·&nbsp; Soi Créatif</div>
+
+  <h1 class="land-title">SSCS<br><em>Soi Créatif</em></h1>
+  <p class="land-sub">Échelle Courte du Soi Créatif</p>
+
+  <p class="land-desc">
+    Ce questionnaire évalue deux dimensions de votre <strong>concept de soi créatif</strong> :
+    votre <strong>identité créative</strong> (le degré auquel vous vous identifiez comme une personne créative)
+    et votre <strong>auto-efficacité créative</strong> (votre confiance en vos capacités créatives).
+    <br><br>
+    Il n'y a ni bonne ni mauvaise réponse — répondez spontanément et honnêtement.
+  </p>
+
+  <div class="land-cta">
+    <button class="btn-primary" onclick="start()">Commencer &nbsp;&#x2192;</button>
+  </div>
+
+  <p class="land-meta">11 items &nbsp;&middot;&nbsp; ~2 minutes &nbsp;&middot;&nbsp; Karwowski (2012)</p>
+
+  <div class="land-deco">
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════ QUESTIONNAIRE ══════════════════════ -->
+<div id="questionnaire" class="screen">
+  <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  <div class="q-wrap" id="qWrap">
+    <div class="q-meta">
+      <span class="q-num" id="qNum">1</span>
+      <div class="q-sep"></div>
+      <span class="q-of">sur 11</span>
+      <span class="q-subscale" id="qSubscale"></span>
+    </div>
+    <p class="q-text" id="qText"></p>
+    <div class="scale-head">
+      <span>Jamais</span>
+      <span>Toujours</span>
+    </div>
+    <div class="scale-grid" id="scaleGrid"></div>
+    <div class="q-nav">
+      <button class="btn-ghost" id="btnBack" onclick="goBack()">&#x2190; Retour</button>
+      <button class="btn-next" id="btnNext" onclick="goNext()">Suivant &nbsp;&#x2192;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ RÉSULTATS ══════════════════════ -->
+<div id="results" class="screen">
+  <div class="res-wrap">
+    <div class="res-head">
+      <div class="res-eyebrow">Vos Résultats</div>
+      <h2 class="res-title">Concept de Soi <em>Créatif</em></h2>
+    </div>
+
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="176" height="176" viewBox="0 0 176 176">
+          <circle cx="88" cy="88" r="76" fill="none" stroke="#2a2620" stroke-width="6"/>
+          <circle id="ringArc" cx="88" cy="88" r="76" fill="none"
+            stroke="#d4a53f" stroke-width="6" stroke-linecap="round"
+            stroke-dasharray="477.52" stroke-dashoffset="477.52"
+            style="transition: stroke-dashoffset 1.3s cubic-bezier(0.4,0,0.2,1), stroke 0.5s"/>
+        </svg>
+        <div class="score-inner">
+          <span class="score-num" id="scoreNum">—</span>
+          <span class="score-denom">/77</span>
+        </div>
+      </div>
+      <div><span class="level-badge" id="levelBadge">—</span></div>
+    </div>
+
+    <div class="feedback-box">
+      <p class="feedback-txt" id="feedbackTxt">—</p>
+    </div>
+
+    <div class="subscales">
+      <div class="sub-card">
+        <div class="sub-tag">Sous-échelle 1</div>
+        <div class="sub-name">Identité Créative</div>
+        <div class="sub-score" id="idScore">—<span>/35</span></div>
+        <div class="sub-track"><div class="sub-fill" id="idFill" style="background:var(--sage)"></div></div>
+        <p class="sub-desc">Le degré auquel vous vous identifiez comme une personne créative, la créativité comme trait central de votre image de vous-même. <em>(items 1, 2, 7, 10, 11)</em></p>
+      </div>
+      <div class="sub-card">
+        <div class="sub-tag">Sous-échelle 2</div>
+        <div class="sub-name">Auto-efficacité Créative</div>
+        <div class="sub-score" id="efScore">—<span>/42</span></div>
+        <div class="sub-track"><div class="sub-fill" id="efFill" style="background:var(--rose)"></div></div>
+        <p class="sub-desc">Votre confiance en votre capacité à résoudre des problèmes de manière créative. <em>(items 3, 4, 5, 6, 8, 9)</em></p>
+      </div>
+    </div>
+
+    <div class="interp-section">
+      <div class="interp-title">Tableau d'interprétation des scores</div>
+      <table class="interp-table" id="interpTable">
+        <thead>
+          <tr>
+            <th>Niveau</th>
+            <th>Score total</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-min="0"  data-max="19">
+            <td><span class="lvl-dot" style="background:#c87858"></span>Très faible</td>
+            <td>11 – 19</td>
+            <td>Faible croyance en soi créatif</td>
+          </tr>
+          <tr data-min="20" data-max="34">
+            <td><span class="lvl-dot" style="background:#d4a53f"></span>Faible</td>
+            <td>20 – 34</td>
+            <td>Concept de soi créatif modeste</td>
+          </tr>
+          <tr data-min="35" data-max="49">
+            <td><span class="lvl-dot" style="background:#72b08a"></span>Modéré</td>
+            <td>35 – 49</td>
+            <td>Vision équilibrée de soi créatif</td>
+          </tr>
+          <tr data-min="50" data-max="64">
+            <td><span class="lvl-dot" style="background:#6aa4c8"></span>Élevé</td>
+            <td>50 – 64</td>
+            <td>Forte confiance créative</td>
+          </tr>
+          <tr data-min="65" data-max="77">
+            <td><span class="lvl-dot" style="background:#a06fc8"></span>Très élevé</td>
+            <td>65 – 77</td>
+            <td>Très forte croyance en soi créatif</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="res-footer">
+      <p>Envie de recommencer ou de partager avec vos étudiant·e·s ?</p>
+      <button class="btn-ghost" onclick="restart()">&#x21BA;&nbsp; Refaire le questionnaire</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── ITEMS ───────────────────────────────────────────────────── */
+  const Qs = [
+    "Je pense que je suis une personne créative.",
+    "Ma créativité est importante pour ce que je suis.",
+    "Je sais que je peux résoudre efficacement même des problèmes complexes.",
+    "J'ai confiance en mes capacités créatives.",
+    "Mon imagination et mon ingéniosité me distinguent de mes ami·e·s.",
+    "À de nombreuses reprises, j'ai prouvé que je pouvais faire face à des situations difficiles.",
+    "Être une personne créative est important pour moi.",
+    "Je suis sûr·e de pouvoir résoudre des problèmes nécessitant une pensée créative.",
+    "Je suis doué·e pour proposer des solutions originales aux problèmes.",
+    "La créativité est une part importante de moi-même.",
+    "L'ingéniosité est une caractéristique qui est importante pour moi."
+  ];
+
+  const SCALE = ['Jamais', 'Très rarement', 'Rarement', 'De temps en temps', 'Souvent', 'Très souvent', 'Toujours'];
+
+  const ID_ITEMS = [0, 1, 6, 9, 10];   // Identité créative   (items 1,2,7,10,11)
+  const EF_ITEMS = [2, 3, 4, 5, 7, 8]; // Auto-efficacité créative (items 3,4,5,6,8,9)
+
+  /* ── ÉTAT ────────────────────────────────────────────────────── */
+  let cur = 0;
+  let ans = Array(11).fill(null);
+
+  /* ── FEEDBACK ────────────────────────────────────────────────── */
+  function feedback(score) {
+    if (score < 20) return {
+      level: 'Très faible', color: 'var(--rose)',
+      text: "Votre concept de soi créatif est actuellement assez bas. Cela peut refléter un doute sur vos capacités créatives ou le sentiment que la créativité n'est pas centrale dans votre identité. Rappelez-vous que la confiance en soi créatif n'est pas figée : elle se construit à travers la pratique, les petites réussites et un environnement encourageant. Reconnaître les moments d'ingéniosité du quotidien est déjà un premier pas."
+    };
+    if (score < 35) return {
+      level: 'Faible', color: 'var(--gold)',
+      text: "Vous avez une vision modeste de votre soi créatif. Il est possible que vous possédiez davantage de capacités créatives que vous ne le pensez. Explorer des activités créatives à faibles enjeux (créativité du quotidien), n'hésitez pas à vous tromper. Enfin dans les moments de doute, identifiez les expériences où vous avez résolu un problème de manière originale. Cela peut progressivement renforcer votre confiance et votre identité créative."
+    };
+    if (score < 50) return {
+      level: 'Modéré', color: 'var(--sage)',
+      text: "Vous avez une vision équilibrée et réaliste de votre soi créatif. Vous reconnaissez vos qualités créatives tout en étant conscient·e des aspects à développer. Avec une pratique intentionnelle et une volonté d'accepter l'incertitude, il y a un vrai potentiel de progression de votre perception, tant dans ce que vous savez de vous-même que dans vos réalisations créatives."
+    };
+    if (score < 65) return {
+      level: 'Élevé', color: 'var(--sky)',
+      text: "Vous avez un concept de soi créatif solide. Vous vous percevez généralement comme créatif·ve et vous faites confiance à votre capacité à relever des défis créatifs. Cette confiance est un véritable atout : elle vous rend plus enclin·e à prendre des risques, à persévérer face aux obstacles et à vous engager pleinement dans des problèmes ouverts."
+    };
+    return {
+      level: 'Très élevé', color: 'var(--violet)',
+      text: "Votre concept de soi créatif est très fort. Vous avez une identité créative profondément intégrée et une grande confiance en vos capacités créatives. Cette croyance robuste en vous-même est l'un des prédicteurs les plus fiables de l'engagement et de la réussite créatifs. Continuez à la cultiver et à la partager autour de vous."
+    };
+  }
+
+  /* ── NAVIGATION ──────────────────────────────────────────────── */
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function start() {
+    cur = 0;
+    ans = Array(11).fill(null);
+    show('questionnaire');
+    render(0);
+  }
+
+  function render(i) {
+    cur = i;
+    document.getElementById('progFill').style.width = (i / 11 * 100) + '%';
+    document.getElementById('qNum').textContent = i + 1;
+    document.getElementById('qText').textContent = Qs[i];
+
+    const tag = document.getElementById('qSubscale');
+    if (ID_ITEMS.includes(i)) {
+      tag.textContent = 'Identité créative';
+      tag.className = 'q-subscale identity';
+    } else {
+      tag.textContent = 'Auto-efficacité';
+      tag.className = 'q-subscale efficacy';
+    }
+
+    const grid = document.getElementById('scaleGrid');
+    grid.innerHTML = '';
+    SCALE.forEach((lbl, idx) => {
+      const val = idx + 1;
+      const btn = document.createElement('button');
+      btn.className = 'sc-btn' + (ans[i] === val ? ' sel' : '');
+      btn.setAttribute('aria-label', lbl);
+      btn.innerHTML = `<span class="n">${val}</span><span class="lbl">${lbl}</span>`;
+      btn.onclick = () => pick(val);
+      grid.appendChild(btn);
+    });
+
+    document.getElementById('btnBack').style.visibility = i === 0 ? 'hidden' : 'visible';
+    refreshNext();
+  }
+
+  function pick(val) {
+    ans[cur] = val;
+    document.querySelectorAll('.sc-btn').forEach((b, i) => {
+      b.classList.toggle('sel', i + 1 === val);
+    });
+    refreshNext();
+    setTimeout(() => {
+      if (document.getElementById('btnNext').classList.contains('on')) goNext();
+    }, 420);
+  }
+
+  function refreshNext() {
+    const btn = document.getElementById('btnNext');
+    btn.classList.toggle('on', ans[cur] !== null);
+    btn.innerHTML = cur === 10 ? 'Voir les résultats &nbsp;&#x2192;' : 'Suivant &nbsp;&#x2192;';
+  }
+
+  function goNext() {
+    if (!ans[cur]) return;
+    if (cur < 10) { render(cur + 1); }
+    else { showResults(); }
+  }
+
+  function goBack() { if (cur > 0) render(cur - 1); }
+
+  /* ── RÉSULTATS ───────────────────────────────────────────────── */
+  function showResults() {
+    show('results');
+    document.getElementById('progFill').style.width = '100%';
+
+    const total   = ans.reduce((s, v) => s + (v || 0), 0);
+    const idScore = ID_ITEMS.reduce((s, i) => s + (ans[i] || 0), 0);
+    const efScore = EF_ITEMS.reduce((s, i) => s + (ans[i] || 0), 0);
+    const fb = feedback(total);
+
+    document.getElementById('scoreNum').textContent = total;
+
+    const badge = document.getElementById('levelBadge');
+    badge.textContent = fb.level;
+    badge.style.color = fb.color;
+    badge.style.borderColor = fb.color;
+
+    document.getElementById('feedbackTxt').textContent = fb.text;
+    document.getElementById('idScore').innerHTML = idScore + '<span>/35</span>';
+    document.getElementById('efScore').innerHTML = efScore + '<span>/42</span>';
+
+    document.querySelectorAll('#interpTable tbody tr').forEach(r => {
+      r.classList.toggle('current', total >= +r.dataset.min && total <= +r.dataset.max);
+    });
+
+    const circ = 2 * Math.PI * 76; // ≈ 477.52
+    setTimeout(() => {
+      const arc = document.getElementById('ringArc');
+      arc.style.stroke = fb.color;
+      arc.style.strokeDashoffset = circ - (total / 77) * circ;
+      document.getElementById('idFill').style.width = (idScore / 35 * 100) + '%';
+      document.getElementById('efFill').style.width = (efScore / 42 * 100) + '%';
+    }, 350);
+  }
+
+  function restart() {
+    document.getElementById('ringArc').style.strokeDashoffset = '477.52';
+    document.getElementById('idFill').style.width = '0%';
+    document.getElementById('efFill').style.width = '0%';
+    show('landing');
+  }
+</script>
+</body>
+</html>
