@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSCS — Short Scale of Creative Self</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #111009;
+      --surface:    #1c1a16;
+      --surface2:   #252118;
+      --border:     #302c24;
+      --text:       #f0ead8;
+      --muted:      #8a7e6a;
+      --gold:       #d4a53f;
+      --gold-light: #f0c96a;
+      --sage:       #72b08a;
+      --rose:       #c87858;
+      --violet:     #a06fc8;
+      --sky:        #6aa4c8;
+      --r: 14px;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html, body { height: 100%; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+    /* ─── NOISE OVERLAY ─────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0; z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.025;
+      pointer-events: none;
+    }
+
+    /* ─── SCREENS ────────────────────────────────────────────── */
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; }
+
+    /* ─── LANDING ─────────────────────────────────────────────── */
+    #landing {
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    #landing::before {
+      content: '';
+      position: absolute;
+      width: 700px; height: 700px;
+      background: radial-gradient(ellipse at center, rgba(212,165,63,0.07) 0%, transparent 68%);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -60%);
+      pointer-events: none;
+    }
+    .land-badge {
+      display: inline-block;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(212,165,63,0.25);
+      padding: 6px 16px; border-radius: 100px;
+      margin-bottom: 36px;
+      position: relative;
+      animation: fadeUp 0.7s var(--ease) both;
+    }
+    .land-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(56px, 10vw, 108px);
+      font-weight: 300; line-height: 0.9; letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      position: relative;
+      animation: fadeUp 0.7s 0.1s var(--ease) both;
+    }
+    .land-title em { color: var(--gold); font-style: italic; }
+    .land-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(17px, 2.5vw, 22px);
+      font-weight: 300; font-style: italic;
+      color: var(--muted);
+      margin-bottom: 40px;
+      animation: fadeUp 0.7s 0.2s var(--ease) both;
+    }
+    .land-desc {
+      max-width: 500px; font-size: 14.5px; font-weight: 300;
+      color: var(--muted); line-height: 1.75;
+      margin-bottom: 48px;
+      animation: fadeUp 0.7s 0.3s var(--ease) both;
+    }
+    .land-desc strong { color: var(--text); font-weight: 400; }
+    .land-cta {
+      animation: fadeUp 0.7s 0.4s var(--ease) both;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .land-meta {
+      font-size: 11px; color: var(--muted); opacity: 0.55; letter-spacing: 0.06em;
+      animation: fadeUp 0.7s 0.5s var(--ease) both;
+      margin-top: 32px;
+    }
+    .land-deco {
+      position: absolute; bottom: 32px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 8px;
+      animation: fadeUp 0.7s 0.6s var(--ease) both;
+    }
+    .land-deco-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--border); }
+    .land-deco-dot:nth-child(2) { background: var(--gold); opacity: 0.5; }
+
+    /* ─── BUTTONS ─────────────────────────────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--gold); color: #111009;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 14px 36px; border-radius: 100px; border: none; cursor: pointer;
+      transition: background 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+    .btn-primary:hover {
+      background: var(--gold-light);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(212,165,63,0.25);
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: transparent; color: var(--muted);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400;
+      padding: 11px 22px; border-radius: 100px;
+      border: 1px solid var(--border); cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+    /* ─── QUESTIONNAIRE ───────────────────────────────────────── */
+    #questionnaire { flex-direction: column; align-items: center; justify-content: flex-start; }
+
+    .prog-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--border); z-index: 100;
+    }
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+      transition: width 0.55s var(--ease);
+      width: 0%;
+    }
+
+    .q-wrap {
+      width: 100%; max-width: 660px;
+      margin: 0 auto;
+      padding: 72px 28px 48px;
+      display: flex; flex-direction: column;
+      animation: fadeUp 0.4s var(--ease) both;
+    }
+
+    .q-meta {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 52px;
+    }
+    .q-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 42px; font-weight: 300; color: var(--gold);
+      line-height: 1;
+    }
+    .q-sep { width: 1px; height: 36px; background: var(--border); }
+    .q-of { font-size: 12px; font-weight: 300; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; }
+    .q-subscale {
+      margin-left: auto;
+      font-size: 10px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); border: 1px solid var(--border);
+      padding: 4px 12px; border-radius: 100px;
+    }
+    .q-subscale.identity { color: var(--sage); border-color: rgba(114,176,138,0.3); }
+    .q-subscale.efficacy { color: var(--rose); border-color: rgba(200,120,88,0.3); }
+
+    .q-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(26px, 4.5vw, 40px);
+      font-weight: 400; line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 52px;
+    }
+
+    /* Scale */
+    .scale-head { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .scale-head span { font-size: 10px; font-weight: 300; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; }
+
+    .scale-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .sc-btn {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 5px;
+      padding: 14px 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s, transform 0.15s;
+      outline: none;
+    }
+    .sc-btn .n {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 300; color: var(--muted);
+      line-height: 1; transition: color 0.18s;
+    }
+    .sc-btn .lbl {
+      font-size: 8.5px; font-weight: 400; color: var(--muted);
+      text-align: center; line-height: 1.2; opacity: 0.7;
+      transition: opacity 0.18s, color 0.18s;
+    }
+    .sc-btn:hover { border-color: rgba(212,165,63,0.35); background: rgba(212,165,63,0.04); transform: translateY(-1px); }
+    .sc-btn:hover .n { color: var(--gold); }
+    .sc-btn:hover .lbl { opacity: 1; color: var(--gold); }
+    .sc-btn.sel {
+      border-color: var(--gold);
+      background: rgba(212,165,63,0.1);
+    }
+    .sc-btn.sel .n { color: var(--gold-light); }
+    .sc-btn.sel .lbl { color: var(--gold); opacity: 1; }
+
+    .q-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 44px;
+    }
+    .btn-next {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold); color: #111009;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 12px 28px; border-radius: 100px; border: none; cursor: pointer;
+      transition: background 0.2s, transform 0.2s, opacity 0.2s;
+      opacity: 0.25; pointer-events: none;
+    }
+    .btn-next.on { opacity: 1; pointer-events: all; }
+    .btn-next.on:hover { background: var(--gold-light); transform: translateX(2px); }
+
+    /* ─── RESULTS ─────────────────────────────────────────────── */
+    #results { flex-direction: column; align-items: center; }
+
+    .res-wrap {
+      width: 100%; max-width: 700px;
+      margin: 0 auto;
+      padding: 72px 28px 80px;
+    }
+
+    .res-head { text-align: center; margin-bottom: 56px; }
+    .res-eyebrow {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 14px;
+      animation: fadeUp 0.5s var(--ease) both;
+    }
+    .res-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(42px, 7vw, 76px);
+      font-weight: 300; line-height: 0.95;
+      animation: fadeUp 0.5s 0.08s var(--ease) both;
+    }
+    .res-title em { color: var(--gold); font-style: italic; }
+
+    /* Score ring */
+    .score-wrap { text-align: center; margin-bottom: 44px; animation: fadeUp 0.5s 0.15s var(--ease) both; }
+    .score-ring {
+      position: relative; display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 176px; height: 176px;
+      margin-bottom: 20px;
+    }
+    .score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+    .score-inner { position: relative; z-index: 1; }
+    .score-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 58px; font-weight: 300; line-height: 1;
+      display: block;
+    }
+    .score-denom {
+      font-size: 18px; font-weight: 300; color: var(--muted);
+    }
+    .level-badge {
+      display: inline-block;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 6px 18px; border-radius: 100px;
+      border: 1px solid currentColor;
+      transition: color 0.5s, border-color 0.5s;
+    }
+
+    /* Feedback */
+    .feedback-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 32px 36px;
+      margin-bottom: 32px;
+      position: relative; overflow: hidden;
+      animation: fadeUp 0.5s 0.25s var(--ease) both;
+    }
+    .feedback-box::before {
+      content: '\201C';
+      position: absolute; top: -24px; left: 24px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 140px; color: var(--gold); opacity: 0.06;
+      line-height: 1; pointer-events: none; user-select: none;
+    }
+    .feedback-txt {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 300; font-style: italic;
+      line-height: 1.65; color: var(--text);
+      position: relative; z-index: 1;
+    }
+
+    /* Subscales */
+    .subscales {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 14px; margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.35s var(--ease) both;
+    }
+    .sub-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 24px;
+    }
+    .sub-tag {
+      font-size: 9.5px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .sub-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 21px; font-weight: 400; margin-bottom: 16px;
+    }
+    .sub-score {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 40px; font-weight: 300; line-height: 1;
+      margin-bottom: 14px;
+    }
+    .sub-score span { font-size: 17px; color: var(--muted); }
+    .sub-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .sub-fill { height: 100%; border-radius: 2px; transition: width 1.1s var(--ease); width: 0%; }
+    .sub-desc { margin-top: 12px; font-size: 12.5px; font-weight: 300; color: var(--muted); line-height: 1.55; }
+
+    /* Interpretation table */
+    .interp-section {
+      margin-bottom: 40px;
+      animation: fadeUp 0.5s 0.42s var(--ease) both;
+    }
+    .interp-title {
+      font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 14px;
+    }
+    .interp-table { width: 100%; border-collapse: collapse; }
+    .interp-table th {
+      font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); text-align: left; padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .interp-table td {
+      font-size: 13px; font-weight: 300; color: var(--muted);
+      padding: 10px 12px; border-bottom: 1px solid var(--border);
+    }
+    .interp-table tr.current td { color: var(--text); background: rgba(212,165,63,0.06); }
+    .interp-table td:first-child { font-weight: 400; }
+    .lvl-dot {
+      display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+      margin-right: 7px; vertical-align: middle;
+    }
+
+    /* Footer */
+    .res-footer {
+      text-align: center; padding-top: 28px;
+      border-top: 1px solid var(--border);
+      animation: fadeUp 0.5s 0.5s var(--ease) both;
+    }
+    .res-footer p { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 520px) {
+      .subscales { grid-template-columns: 1fr; }
+      .scale-grid { gap: 4px; }
+      .sc-btn { padding: 11px 2px 8px; }
+      .sc-btn .n { font-size: 17px; }
+      .sc-btn .lbl { font-size: 7px; }
+      .q-subscale { display: none; }
+      .feedback-box { padding: 24px; }
+      .feedback-txt { font-size: 18px; }
+    }
+
+    /* ─── ANIMATIONS ─────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+    @keyframes popIn {
+      0%   { transform: scale(0.85); opacity: 0; }
+      70%  { transform: scale(1.04); }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+    .pop { animation: popIn 0.5s var(--ease) both; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════ LANDING ═══════════════════════════ -->
+<div id="landing" class="screen active">
+  <div class="land-badge">Karwowski, 2012 &nbsp;·&nbsp; Creative Self</div>
+
+  <h1 class="land-title">SSCS<br><em>Creative Self</em></h1>
+  <p class="land-sub">Short Scale of Creative Self</p>
+
+  <p class="land-desc">
+    This questionnaire evaluates two dimensions of your <strong>creative self-concept</strong> :
+    your <strong>creative identity</strong> (how central creativity is to who you are)
+    and your <strong>creative self-efficacy</strong> (your confidence in tackling creative challenges).
+    <br><br>
+    There are no right or wrong answers — respond spontaneously and honestly.
+  </p>
+
+  <div class="land-cta">
+    <button class="btn-primary" onclick="start()">Begin &nbsp;&#x2192;</button>
+  </div>
+
+  <p class="land-meta">11 items &nbsp;&middot;&nbsp; ~2 minutes &nbsp;&middot;&nbsp; Karwowski (2012)</p>
+
+  <div class="land-deco">
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+    <div class="land-deco-dot"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ QUESTIONNAIRE ═══════════════════════════ -->
+<div id="questionnaire" class="screen">
+  <div class="prog-bar"><div class="prog-fill" id="progFill"></div></div>
+  <div class="q-wrap" id="qWrap">
+    <div class="q-meta">
+      <span class="q-num" id="qNum">1</span>
+      <div class="q-sep"></div>
+      <span class="q-of" id="qOf">of 11</span>
+      <span class="q-subscale" id="qSubscale"></span>
+    </div>
+    <p class="q-text" id="qText"></p>
+    <div class="scale-head">
+      <span>Never</span>
+      <span>Always</span>
+    </div>
+    <div class="scale-grid" id="scaleGrid"></div>
+    <div class="q-nav">
+      <button class="btn-ghost" id="btnBack" onclick="goBack()">&#x2190; Back</button>
+      <button class="btn-next" id="btnNext" onclick="goNext()">Next &nbsp;&#x2192;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ RESULTS ═══════════════════════════ -->
+<div id="results" class="screen">
+  <div class="res-wrap">
+    <div class="res-head">
+      <div class="res-eyebrow">Your Results</div>
+      <h2 class="res-title">Creative <em>Self-Concept</em></h2>
+    </div>
+
+    <!-- Ring -->
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="176" height="176" viewBox="0 0 176 176">
+          <circle cx="88" cy="88" r="76" fill="none" stroke="#2a2620" stroke-width="6"/>
+          <circle id="ringArc" cx="88" cy="88" r="76" fill="none"
+            stroke="#d4a53f" stroke-width="6" stroke-linecap="round"
+            stroke-dasharray="477.52" stroke-dashoffset="477.52"
+            style="transition: stroke-dashoffset 1.3s cubic-bezier(0.4,0,0.2,1), stroke 0.5s"/>
+        </svg>
+        <div class="score-inner">
+          <span class="score-num" id="scoreNum">—</span>
+          <span class="score-denom">/77</span>
+        </div>
+      </div>
+      <div><span class="level-badge" id="levelBadge">—</span></div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback-box">
+      <p class="feedback-txt" id="feedbackTxt">—</p>
+    </div>
+
+    <!-- Subscales -->
+    <div class="subscales">
+      <div class="sub-card">
+        <div class="sub-tag">Subscale 1</div>
+        <div class="sub-name">Creative Identity</div>
+        <div class="sub-score" id="idScore">—<span>/35</span></div>
+        <div class="sub-track"><div class="sub-fill" id="idFill" style="background:var(--sage)"></div></div>
+        <p class="sub-desc">How central creativity is to your sense of self and personal identity. <em>(items 1, 2, 7, 10, 11)</em></p>
+      </div>
+      <div class="sub-card">
+        <div class="sub-tag">Subscale 2</div>
+        <div class="sub-name">Creative Self-Efficacy</div>
+        <div class="sub-score" id="efScore">—<span>/42</span></div>
+        <div class="sub-track"><div class="sub-fill" id="efFill" style="background:var(--rose)"></div></div>
+        <p class="sub-desc">Your confidence in your ability to solve problems creatively. <em>(items 3, 4, 5, 6, 8, 9)</em></p>
+      </div>
+    </div>
+
+    <!-- Interpretation table -->
+    <div class="interp-section">
+      <div class="interp-title">Score Interpretation Reference</div>
+      <table class="interp-table" id="interpTable">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Total Score</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-min="0"  data-max="19">
+            <td><span class="lvl-dot" style="background:#c87858"></span>Very Low</td>
+            <td>11 – 19</td>
+            <td>Little creative self-belief</td>
+          </tr>
+          <tr data-min="20" data-max="34">
+            <td><span class="lvl-dot" style="background:#d4a53f"></span>Low</td>
+            <td>20 – 34</td>
+            <td>Modest creative self-concept</td>
+          </tr>
+          <tr data-min="35" data-max="49">
+            <td><span class="lvl-dot" style="background:#72b08a"></span>Moderate</td>
+            <td>35 – 49</td>
+            <td>Balanced creative self-view</td>
+          </tr>
+          <tr data-min="50" data-max="64">
+            <td><span class="lvl-dot" style="background:#6aa4c8"></span>High</td>
+            <td>50 – 64</td>
+            <td>Strong creative confidence</td>
+          </tr>
+          <tr data-min="65" data-max="77">
+            <td><span class="lvl-dot" style="background:#a06fc8"></span>Very High</td>
+            <td>65 – 77</td>
+            <td>Very strong creative self-belief</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="res-footer">
+      <p>Want to reflect again or share with a student?</p>
+      <button class="btn-ghost" onclick="restart()">&#x21BA;&nbsp; Retake the questionnaire</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ── DATA ────────────────────────────────────────────────────── */
+  const Qs = [
+    "I think I am a creative person.",
+    "My creativity is important for who I am.",
+    "I know I can efficiently solve even complicated problems.",
+    "I trust my creative abilities.",
+    "My imagination and ingenuity distinguish me from my friends.",
+    "Many times I have proved that I can cope with difficult situations.",
+    "Being a creative person is important to me.",
+    "I am sure I can deal with problems requiring creative thinking.",
+    "I am good at proposing original solutions to problems.",
+    "Creativity is an important part of my self.",
+    "Ingenuity is a characteristic which is important to me."
+  ];
+
+  const SCALE = ['Never', 'Very rarely', 'Rarely', 'From time to time', 'Often', 'Very often', 'Always'];
+
+  // 0-indexed subscale membership
+  const ID_ITEMS = [0, 1, 6, 9, 10];   // Creative Identity  (items 1,2,7,10,11)
+  const EF_ITEMS = [2, 3, 4, 5, 7, 8]; // Creative Self-Efficacy (items 3,4,5,6,8,9)
+
+  /* ── STATE ───────────────────────────────────────────────────── */
+  let cur = 0;
+  let ans = Array(11).fill(null);
+
+  /* ── FEEDBACK ────────────────────────────────────────────────── */
+  function feedback(score) {
+    if (score < 20) return {
+      level: 'Very Low', color: 'var(--rose)',
+      text: 'Your creative self-concept is currently quite low. This may reflect self-doubt about your creative abilities or a sense that creativity is not central to who you are. Know that creative self-belief is not fixed — it grows through practice, small successes, and supportive environments. Even noticing moments of everyday ingenuity can begin to shift your perspective.'
+    };
+    if (score < 35) return {
+      level: 'Low', color: 'var(--gold)',
+      text: 'You have a modest sense of your creative self. You may possess more creative capacity than you currently recognise. Experimenting with low-stakes creative activities, and reflecting on past moments where you solved a problem in an original way, can gradually build your confidence and creative identity.'
+    };
+    if (score < 50) return {
+      level: 'Moderate', color: 'var(--sage)',
+      text: 'You have a balanced and realistic sense of your creative self. You acknowledge your creative qualities while remaining aware of areas to develop. With intentional practice and a willingness to embrace uncertainty, there is real room to grow — both in how creative you feel, and in the creative work you produce.'
+    };
+    if (score < 65) return {
+      level: 'High', color: 'var(--sky)',
+      text: 'You have a strong creative self-concept. You generally see yourself as creative and trust your ability to handle creative challenges. This confidence is a genuine asset: it makes you more likely to take creative risks, persist through setbacks, and engage deeply with open-ended problems.'
+    };
+    return {
+      level: 'Very High', color: 'var(--violet)',
+      text: 'Your creative self-concept is very strong. You have a deeply integrated creative identity and high confidence in your creative abilities. This robust self-belief is one of the most reliable predictors of creative engagement and achievement — keep nurturing it and sharing it with those around you.'
+    };
+  }
+
+  /* ── SCREENS ─────────────────────────────────────────────────── */
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  /* ── START ───────────────────────────────────────────────────── */
+  function start() {
+    cur = 0;
+    ans = Array(11).fill(null);
+    show('questionnaire');
+    render(0);
+  }
+
+  /* ── RENDER QUESTION ─────────────────────────────────────────── */
+  function render(i) {
+    cur = i;
+    const pct = (i / 11) * 100;
+    document.getElementById('progFill').style.width = pct + '%';
+    document.getElementById('qNum').textContent = i + 1;
+    document.getElementById('qText').textContent = Qs[i];
+
+    // Subscale tag
+    const tag = document.getElementById('qSubscale');
+    if (ID_ITEMS.includes(i)) {
+      tag.textContent = 'Creative Identity';
+      tag.className = 'q-subscale identity';
+    } else {
+      tag.textContent = 'Self-Efficacy';
+      tag.className = 'q-subscale efficacy';
+    }
+
+    // Scale buttons
+    const grid = document.getElementById('scaleGrid');
+    grid.innerHTML = '';
+    SCALE.forEach((lbl, idx) => {
+      const val = idx + 1;
+      const btn = document.createElement('button');
+      btn.className = 'sc-btn' + (ans[i] === val ? ' sel' : '');
+      btn.setAttribute('aria-label', lbl);
+      btn.innerHTML = `<span class="n">${val}</span><span class="lbl">${lbl}</span>`;
+      btn.onclick = () => pick(val);
+      grid.appendChild(btn);
+    });
+
+    // Nav state
+    document.getElementById('btnBack').style.visibility = i === 0 ? 'hidden' : 'visible';
+    refreshNext();
+  }
+
+  function pick(val) {
+    ans[cur] = val;
+    document.querySelectorAll('.sc-btn').forEach((b, i) => {
+      b.classList.toggle('sel', i + 1 === val);
+    });
+    refreshNext();
+    // Auto-advance after short delay for a smoother feel
+    setTimeout(() => {
+      if (document.getElementById('btnNext').classList.contains('on')) goNext();
+    }, 420);
+  }
+
+  function refreshNext() {
+    const btn = document.getElementById('btnNext');
+    const ok = ans[cur] !== null;
+    btn.classList.toggle('on', ok);
+    btn.innerHTML = cur === 10 ? 'See Results &nbsp;&#x2192;' : 'Next &nbsp;&#x2192;';
+  }
+
+  function goNext() {
+    if (!ans[cur]) return;
+    if (cur < 10) { render(cur + 1); }
+    else { showResults(); }
+  }
+
+  function goBack() { if (cur > 0) render(cur - 1); }
+
+  /* ── RESULTS ─────────────────────────────────────────────────── */
+  function showResults() {
+    show('results');
+    document.getElementById('progFill').style.width = '100%';
+
+    const total = ans.reduce((s, v) => s + (v || 0), 0);
+    const idScore = ID_ITEMS.reduce((s, i) => s + (ans[i] || 0), 0);
+    const efScore = EF_ITEMS.reduce((s, i) => s + (ans[i] || 0), 0);
+    const fb = feedback(total);
+
+    // Score number
+    document.getElementById('scoreNum').textContent = total;
+
+    // Badge
+    const badge = document.getElementById('levelBadge');
+    badge.textContent = fb.level;
+    badge.style.color = fb.color;
+    badge.style.borderColor = fb.color;
+
+    // Feedback
+    document.getElementById('feedbackTxt').textContent = fb.text;
+
+    // Subscale scores
+    document.getElementById('idScore').innerHTML = idScore + '<span>/35</span>';
+    document.getElementById('efScore').innerHTML = efScore + '<span>/42</span>';
+
+    // Highlight current row in interpretation table
+    const rows = document.querySelectorAll('#interpTable tbody tr');
+    rows.forEach(r => {
+      const min = +r.dataset.min, max = +r.dataset.max;
+      r.classList.toggle('current', total >= min && total <= max);
+    });
+
+    // Animate ring & bars
+    const circ = 2 * Math.PI * 76; // ≈ 477.52
+    const offset = circ - (total / 77) * circ;
+    setTimeout(() => {
+      const arc = document.getElementById('ringArc');
+      arc.style.stroke = fb.color;
+      arc.style.strokeDashoffset = offset;
+      document.getElementById('idFill').style.width = (idScore / 35 * 100) + '%';
+      document.getElementById('efFill').style.width = (efScore / 42 * 100) + '%';
+    }, 350);
+  }
+
+  /* ── RESTART ─────────────────────────────────────────────────── */
+  function restart() {
+    document.getElementById('ringArc').style.strokeDashoffset = '477.52';
+    document.getElementById('idFill').style.width = '0%';
+    document.getElementById('efFill').style.width = '0%';
+    show('landing');
+  }
+</script>
+</body>
+</html>
